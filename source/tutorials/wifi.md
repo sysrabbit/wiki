@@ -40,27 +40,37 @@ Click save.
 
 # Connect with iwd
 
-These instructions will allow you to connect to Eduroam using iwd, the replacment for wpa_supplicant.
+These instructions will allow you to connect to PAL3.0 or Eduroam using iwd, the replacment for wpa_supplicant.
 
-Create the file /var/lib/iwd/eduroam.8021x
+**Note**: If a network contains any characters that are not alphanumeric, spaces, underscores, or dashes you need to name the configuration file as the SSID encoded in hexademical with '=' prepended and the security standard (.open, .psk or .8021x) appended. IWD can do this if you connect to a network via `iwctl`, however you must do this manually for networks using 802.1x security as iwctl cannot automatically configure 802.1x networks at this time. For example, `PAL3.0` becomes `=50414c332e30.8021x`. Replace `SSID` in the following bash snippet to encode any network name correctly.
+
+    $ echo \=$(echo "SSID" | xxd  -c 256 -ps | sed "s/..$//")
+
+Create the file `/var/lib/iwd/eduroam.8021x` or `/var/lib/iwd/=50414c332e30.8021x`
 
     [Security]
     EAP-Method=PEAP
     EAP-Identity=anonymous
     EAP-PEAP-Phase2-Method=MSCHAPV2
-    EAP-PEAP-Phase2-Identity="Username"
-    EAP-PEAP-Phase2-Password="Password"
+    EAP-PEAP-Phase2-Identity=Username
+    EAP-PEAP-Phase2-Password=Password
     
     [Settings]
     Autoconnect=true
-    
-Manually connect with
 
-    $ iwctl station <wifi station> connect eduroam
-    
 Get wifi stations with
 
     $ iwctl station list
+    
+Get wifi networks with
+
+    $ iwctl station <wifi station> get-networks
+
+Manually connect with the following
+
+    $ iwctl station <wifi station> connect <ssid>
+    
+More information about iwd can be found at https://www.mankier.com/5/iwd.network or https://wiki.archlinux.org/index.php/Iwd
 
 # Connect with netctl
 
